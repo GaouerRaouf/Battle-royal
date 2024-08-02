@@ -9,7 +9,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public int maxPlayers = 10;
 
-    private static NetworkManager instance;
+    public static NetworkManager instance;
 
     private void Awake()
     {
