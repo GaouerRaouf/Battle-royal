@@ -1,67 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-
 public class CameraController : MonoBehaviour
 {
-    [Header("Look senstivity")]
+    [Header("Look Sensitivity")]
     public float sensX;
     public float sensY;
-
-    [Header("Clamp")]
+    [Header("Clamping")]
     public float minY;
     public float maxY;
-
     [Header("Spectator")]
-    private bool isSpectator = false;
-    private float rotX, rotY;
     public float spectatorMoveSpeed;
-
-
-
-    // Start is called before the first frame update
+    private float rotX;
+    private float rotY;
+    private bool isSpectator;
     void Start()
     {
+        // lock the cursor to the middle of the screen
         Cursor.lockState = CursorLockMode.Locked;
     }
-
-    // Update is called once per frame
     void LateUpdate()
     {
+        // get the mouse movement inputs
         rotX += Input.GetAxis("Mouse X") * sensX;
         rotY += Input.GetAxis("Mouse Y") * sensY;
-
-        Mathf.Clamp(rotY, minY, maxY);
-
+        // clamp the vertical rotation
+        rotY = Mathf.Clamp(rotY, minY, maxY);
+        // are we spectating?
         if (isSpectator)
         {
+            // rotate the cam vertically
             transform.rotation = Quaternion.Euler(-rotY, rotX, 0);
-
-
+            // movement
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
             float y = 0;
-
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
+            if (Input.GetKey(KeyCode.E))
                 y = 1;
-            }
-            if (Input.GetKeyDown(KeyCode.E))
-            {
+            else if (Input.GetKey(KeyCode.Q))
                 y = -1;
-            }
-
-
             Vector3 dir = transform.right * x + transform.up * y + transform.forward * z;
             transform.position += dir * spectatorMoveSpeed * Time.deltaTime;
         }
         else
         {
+            // rotate the cam vertically
             transform.localRotation = Quaternion.Euler(-rotY, 0, 0);
-
+            // rotate the player horizontally
             transform.parent.rotation = Quaternion.Euler(0, rotX, 0);
         }
-
+    }
+    public void SetAsSpectator()
+    {
+        isSpectator = true;
+        transform.parent = null;
     }
 }
